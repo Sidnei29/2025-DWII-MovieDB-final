@@ -1,4 +1,5 @@
 {% from 'bootstrap5/utils.html' import render_icon %}
+{% from 'components/modal_funcao_tecnica.jinja2' import render_modal_funcao_tecnica %}
 {% extends "_layout.jinja2" %}
 {% block content %}
     <div class="d-flex flex-column min-vh-100 justify-content-center align-items-center p-5">
@@ -94,8 +95,8 @@
                                                     </div>
                                                     <!-- Funções -->
                                                     <div class="text-muted">
-                                                        {% for nome_funcao, creditado in funcao.funcoes %}
-                                                            {{ nome_funcao }}{% if not loop.last %}, {% endif %}
+                                                        {% for nome_funcao, creditado, funcao_id in funcao.funcoes %}
+                                                            <span class="funcao-clickable" data-funcao-id="{{ funcao_id }}" style="cursor: pointer;">{{ nome_funcao }}</span>{% if not loop.last %}, {% endif %}
                                                         {% endfor %}
                                                     </div>
                                                     <!-- Badge de não creditado se alguma função não for creditada -->
@@ -144,6 +145,9 @@
             </div>
         </div>
     </div>
+    
+    <!-- Modal de Função Técnica -->
+    {{ render_modal_funcao_tecnica() }}
 {% endblock %}
 
 {% block scripts %}

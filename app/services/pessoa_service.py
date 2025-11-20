@@ -63,8 +63,8 @@ class PessoaService:
                     {
                         'filme': Filme,
                         'funcoes': [
-                            ('Diretor', True),   # (nome_funcao, creditado)
-                            ('Montador', False)
+                            ('Diretor', True, uuid),   # (nome_funcao, creditado, funcao_id)
+                            ('Montador', False, uuid)
                         ]
                     },
                     ...
@@ -115,8 +115,8 @@ class PessoaService:
 
         for equipe in resultado:
             filme_id = equipe.filme_id
-            # Adiciona tupla (nome_funcao, creditado)
-            filmes_funcoes[filme_id].append((equipe.funcao_tecnica.nome, equipe.creditado))
+            # Adiciona tupla (nome_funcao, creditado, funcao_id)
+            filmes_funcoes[filme_id].append((equipe.funcao_tecnica.nome, equipe.creditado, equipe.funcao_tecnica_id))
             if filme_id not in filmes_obj:
                 filmes_obj[filme_id] = equipe.filme
 

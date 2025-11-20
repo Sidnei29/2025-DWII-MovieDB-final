@@ -1,0 +1,46 @@
+/* Modal CSS - Estilos customizados para modal de descrição de função técnica */
+/* O Bootstrap 5 já gerencia a estrutura básica do modal, aqui apenas customizamos */
+
+/* Estilo para funções técnicas clicáveis */
+.funcao-clickable {
+    cursor: pointer;
+    color: #0d6efd;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.funcao-clickable:hover {
+    text-decoration: underline;
+    color: #0a58ca;
+}
+
+.funcao-clickable:focus {
+    outline: 2px solid #0d6efd;
+    outline-offset: 2px;
+    border-radius: 2px;
+}
+
+/* Customizações adicionais para o modal body */
+#modalFuncaoTecnicaContent p {
+    margin: 0 0 1rem 0;
+    line-height: 1.6;
+    color: #495057;
+}
+
+#modalFuncaoTecnicaContent p:last-child {
+    margin-bottom: 0;
+}
+
+/* Responsive Styles - Mobile Devices */
+@media (max-width: 768px) {
+    #modalFuncaoTecnicaContent {
+        font-size: 0.95rem;
+    }
+}
+
+/* Extra Small Devices */
+@media (max-width: 480px) {
+    #modalFuncaoTecnicaContent {
+        font-size: 0.9rem;
+    }
+}

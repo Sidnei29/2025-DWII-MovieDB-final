@@ -8,54 +8,11 @@
             <div class="mb-4">
                 <div class="d-flex justify-content-between align-items-center">
                     <h4 class="fw-bold">
-                        {{ render_icon('film', size='1.5em') }} Filmes
+                        {{ render_icon('tags', size='1.5em') }} {{ genero.nome }}
                     </h4>
-                    {% if current_user.is_authenticated %}
-                        <a href="{{ url_for('filme.create_filme') }}" class="btn btn-primary">
-                            {{ render_icon('plus-circle', size='1em') }} Novo Filme
-                        </a>
-                    {% endif %}
-                </div>
-            </div>
-
-            <!-- Filtragem e busca -->
-            <div class="mb-4">
-                <div class="clearfix">
-                    <form id="search_form" action="{{ url_for('filme.listar_filmes') }}" method="GET">
-                        <div class="row g-3 align-items-end">
-                            <!-- Busca por título -->
-                            <div class="col-md-6">
-                                <label for="search" class="form-label">Buscar por título:</label>
-                                <input name="search" type="text" class="form-control" id="search"
-                                       placeholder="Digite o título do filme..."
-                                       value="{{ search if search else '' }}">
-                            </div>
-
-                            <!-- Registros por página -->
-                            <div class="col-md-3">
-                                <label for="per_page" class="form-label">Registros por página:</label>
-                                <select name="per_page" class="form-select" id="per_page">
-                                    {% for qtd in [12, 24, 48, 96] %}
-                                        <option value="{{ qtd }}"{% if qtd == per_page %} selected{% endif %}>{{ qtd }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-
-                            <!-- Botões de ação -->
-                            <div class="col-md-3">
-                                <div class="btn-group w-100" role="group">
-                                    <button type="submit" class="btn btn-secondary">
-                                        {{ render_icon('search', size='1em') }} Buscar
-                                    </button>
-                                    {% if current_user.is_authenticated %}
-                                        <a href="{{ url_for('filme.create_filme') }}" class="btn btn-primary">
-                                            {{ render_icon('plus-circle', size='1em') }} Novo Filme
-                                        </a>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                    </form>
+                    <a href="{{ url_for('filme.listar_filmes') }}" class="btn btn-outline-secondary">
+                        {{ render_icon('arrow-left', size='1em') }} Voltar ao Catálogo
+                    </a>
                 </div>
             </div>
 
@@ -98,14 +55,19 @@
                                                     {% if filme.ano_lancamento %}•{% endif %} {{ filme.duracao_formatada }}
                                                 {% endif %}
                                             </div>
-                                            <!-- Gêneros -->
-                                            {% if filme.listar_nomes_generos %}
-                                                <div class="mb-2">
-                                                    {% for genero in filme.listar_nomes_generos %}
-                                                        <span class="badge bg-secondary me-1"
-                                                              style="font-size: 0.6rem;">{{ genero }}</span>
-                                                    {% endfor %}
-                                                </div>
+                                        </div>
+
+                                        <!-- Informações na parte inferior -->
+                                        <div class="text-white">
+                                            <!-- Sinopse resumida -->
+                                            {% if filme.sinopse %}
+                                                <p class="card-text small mb-0" style="font-size: 0.7rem; line-height: 1.2;">
+                                                    {% if filme.sinopse|length > 100 %}
+                                                        {{ filme.sinopse[:100] }}...
+                                                    {% else %}
+                                                        {{ filme.sinopse }}
+                                                    {% endif %}
+                                                </p>
                                             {% endif %}
                                         </div>
                                     </div>
@@ -139,20 +101,11 @@
                 <div class="text-center py-5">
                     <div class="text-muted">
                         {{ render_icon('film', size='3em', color='secondary') }}
-                        <h5 class="mt-3">Nenhum filme encontrado</h5>
-                        {% if search %}
-                            <p>Não foram encontrados filmes com o termo "{{ search }}".</p>
-                            <a href="{{ url_for('filme.listar_filmes') }}" class="btn btn-secondary">
-                                Ver todos os filmes
-                            </a>
-                        {% else %}
-                            <p>Ainda não há filmes cadastrados no sistema.</p>
-                            {% if current_user.is_authenticated %}
-                                <a href="{{ url_for('filme.create_filme') }}" class="btn btn-primary">
-                                    {{ render_icon('plus-circle', size='1em') }} Cadastrar primeiro filme
-                                </a>
-                            {% endif %}
-                        {% endif %}
+                        <h5 class="mt-3">Nenhum filme encontrado neste gênero</h5>
+                        <p>Não há filmes cadastrados para o gênero "{{ genero.nome }}".</p>
+                        <a href="{{ url_for('filme.listar_filmes') }}" class="btn btn-secondary">
+                            {{ render_icon('arrow-left', size='1em') }} Voltar ao Catálogo
+                        </a>
                     </div>
                 </div>
             {% endif %}
@@ -164,10 +117,10 @@
                         Mostrando {{ pagination.first }} a {{ pagination.last }} de {{ pagination.total }} filmes
                     </div>
                     <div>
-                        {{ render_pagination(pagination, 'filme.listar_filmes',
+                        {{ render_pagination(pagination, 'genero.filmes_por_genero',
                                             size='sm',
                                             align='right',
-                                            args={'search': search, 'per_page': per_page}) }}
+                                            args={'genero_id': genero.id, 'per_page': per_page}) }}
                     </div>
                 </div>
             {% endif %}

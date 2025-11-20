@@ -1,0 +1,45 @@
+{# Modal para exibir descrição de função técnica #}
+{% macro render_modal_funcao_tecnica() %}
+<!-- Modal Backdrop -->
+<div class="modal fade" id="modalFuncaoTecnica" tabindex="-1" aria-labelledby="modalFuncaoTecnicaLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalFuncaoTecnicaLabel">Função Técnica</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <!-- Loading Spinner -->
+                <div id="modalFuncaoTecnicaLoading" class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Carregando...</span>
+                    </div>
+                    <p class="mt-3 text-muted">Carregando descrição...</p>
+                </div>
+                
+                <!-- Content Area -->
+                <div id="modalFuncaoTecnicaContent" class="d-none">
+                    <h6 id="modalFuncaoTecnicaNome" class="fw-bold mb-3"></h6>
+                    <div id="modalFuncaoTecnicaDescricao"></div>
+                </div>
+                
+                <!-- Error Message Area -->
+                <div id="modalFuncaoTecnicaError" class="d-none">
+                    <div class="alert alert-danger mb-0" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        <span id="modalFuncaoTecnicaErrorMessage">Erro ao carregar a descrição. Tente novamente.</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endmacro %}

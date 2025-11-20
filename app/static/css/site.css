@@ -59,3 +59,84 @@ body {
 .movie-actions .btn-danger:hover {
     background-color: rgba(220, 53, 69, 1);
 }
+
+.person-card:hover .person-actions {
+    opacity: 1 !important;
+}
+
+.person-actions .btn {
+    backdrop-filter: blur(5px);
+    background-color: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.person-actions .btn:hover {
+    background-color: rgba(255, 255, 255, 1);
+}
+
+.person-actions .btn-warning {
+    background-color: rgba(255, 193, 7, 0.9);
+    border-color: rgba(255, 193, 7, 0.5);
+}
+
+.person-actions .btn-warning:hover {
+    background-color: rgba(255, 193, 7, 1);
+}
+
+.person-actions .btn-danger {
+    background-color: rgba(220, 53, 69, 0.9);
+    border-color: rgba(220, 53, 69, 0.5);
+}
+
+.person-actions .btn-danger:hover {
+    background-color: rgba(220, 53, 69, 1);
+}
+
+/* Estilos para nomes de funções técnicas clicáveis */
+.funcao-clickable {
+    cursor: pointer;
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    text-decoration-color: rgba(0, 0, 0, 0.3);
+    color: inherit;
+    transition: all 0.2s ease-in-out;
+}
+
+.funcao-clickable:hover {
+    text-decoration-style: solid;
+    text-decoration-color: #0d6efd;
+    color: #0d6efd;
+}
+
+.funcao-clickable:focus {
+    outline: 2px solid #0d6efd;
+    outline-offset: 2px;
+    border-radius: 2px;
+    text-decoration-style: solid;
+    text-decoration-color: #0d6efd;
+    color: #0d6efd;
+}
+
+.funcao-clickable:focus-visible {
+    outline: 2px solid #0d6efd;
+    outline-offset: 2px;
+    border-radius: 2px;
+}
+
+/* Garantir contraste adequado em temas escuros */
+@media (prefers-color-scheme: dark) {
+    .funcao-clickable {
+        text-decoration-color: rgba(255, 255, 255, 0.4);
+    }
+    
+    .funcao-clickable:hover,
+    .funcao-clickable:focus {
+        color: #6ea8fe;
+        text-decoration-color: #6ea8fe;
+    }
+    
+    .funcao-clickable:focus,
+    .funcao-clickable:focus-visible {
+        outline-color: #6ea8fe;
+    }
+}

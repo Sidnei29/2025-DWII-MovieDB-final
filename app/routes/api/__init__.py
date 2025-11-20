@@ -1,10 +1,12 @@
 from flask import Blueprint, request, jsonify, current_app, abort
 from flask_login import login_required, current_user
 from sqlalchemy import select, or_
+import uuid
 
 from app import db
 from app.models.pessoa import Pessoa, Ator
 from app.models.filme import Genero, FuncaoTecnica
+from app.services.funcao_tecnica_service import FuncaoTecnicaService, FuncaoTecnicaServiceError
 
 api_bp = Blueprint(name='api',
                     import_name=__name__,
@@ -174,3 +176,67 @@ def search_funcao_tecnica():
     except Exception as e:
         current_app.logger.error("Falha na busca de função técnica '%s' para autocomplete: %s", query, str(e))
         return jsonify([]), 500
+
+
+@api_bp.route('/funcao-tecnica/<uuid:funcao_id>')
+def funcao_tecnica_descricao(funcao_id: uuid.UUID):
+    """Retorna informações detalhadas de uma função técnica incluindo sua descrição.
+
+    Este endpoint é público e não requer autenticação, permitindo que modais
+    exibam descrições de funções técnicas em páginas de detalhes de filmes e pessoas.
+
+    Args:
+        funcao_id: UUID da função técnica
+
+    Returns:
+        JSON com:
+            - id: UUID da função técnica
+            - nome: Nome da função técnica
+            - descricao: Descrição da função (ou mensagem padrão se não disponível)
+            - success: True se a operação foi bem-sucedida
+
+    Status Codes:
+        200: Sucesso - retorna dados da função técnica
+        404: Função técnica não encontrada
+        500: Erro interno do servidor
+    """
+    try:
+        # Busca informações da função técnica usando o serviço
+        info = FuncaoTecnicaService.obter_descricao(funcao_id)
+
+        # Se não houver descrição, usa mensagem padrão
+        descricao = info['descricao']
+        if not descricao or descricao.strip() == '':
+            descricao = 'Descrição não disponível para esta função.'
+
+        return jsonify({
+            'id': str(info['id']),
+            'nome': info['nome'],
+            'descricao': descricao,
+            'success': True
+        }), 200
+
+    except FuncaoTecnicaServiceError as e:
+        # Trata erro de função não encontrada
+        error_msg = str(e)
+        if 'não encontrada' in error_msg.lower():
+            current_app.logger.warning(f"Função técnica não encontrada: {funcao_id}")
+            return jsonify({
+                'error': 'Função técnica não encontrada.',
+                'success': False
+            }), 404
+        else:
+            # Outros erros do serviço
+            current_app.logger.error(f"Erro ao buscar função técnica {funcao_id}: {error_msg}")
+            return jsonify({
+                'error': 'Erro ao buscar informações da função técnica.',
+                'success': False
+            }), 500
+
+    except Exception as e:
+        # Trata erros inesperados
+        current_app.logger.error(f"Erro inesperado ao buscar função técnica {funcao_id}: {str(e)}")
+        return jsonify({
+            'error': 'Erro interno do servidor.',
+            'success': False
+        }), 500

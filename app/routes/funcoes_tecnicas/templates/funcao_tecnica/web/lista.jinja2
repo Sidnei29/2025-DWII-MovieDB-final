@@ -45,6 +45,7 @@
                     <tr class="align-bottom">
                         <th scope="col">Nome</th>
                         <th scope="col">Descrição</th>
+                        <th scope="col" class="text-center">Pessoas</th>
                         <th scope="col" class="text-center">Ativo</th>
                         <th scope="col" class="text-center">Operações</th>
                     </tr>
@@ -62,7 +63,17 @@
                                     N/A
                                 {%- endif -%}
                             </td>
-
+                            <td class="text-center align-middle">
+                                {% set pessoa_count = ft.pessoas|length %}
+                                {% if pessoa_count > 0 %}
+                                    <a href="{{ url_for('funcao_tecnica.pessoas_por_funcao', funcao_id=ft.id) }}" 
+                                       class="btn btn-sm btn-outline-primary">
+                                        {{ render_icon('people', size='1em') }} {{ pessoa_count }}
+                                    </a>
+                                {% else %}
+                                    <span class="text-muted">0</span>
+                                {% endif %}
+                            </td>
                             <td class="text-center align-middle">
                                 {%- if ft.ativo -%}
                                     {{ render_icon('check', color='success', size='2em', title='Ativo') }}

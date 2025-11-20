@@ -9,6 +9,7 @@ from app.forms.funcoes_tecnicas import FuncaoTecnicaEditForm
 from app.infra.modulos import db
 from app.models.filme import FuncaoTecnica
 from app.services.crud_service import CrudService
+from app.services.funcao_tecnica_service import FuncaoTecnicaService, FuncaoTecnicaServiceError
 
 funcao_tecnica_bp = Blueprint(name='funcao_tecnica',
                               import_name=__name__,
@@ -147,6 +148,57 @@ def editar_funcao_tecnica(funcao_tecnica_id: uuid.UUID):
                            title="Editar função técnica",
                            form=form,
                            numero_de_pessoas=numero_de_pessoas)
+
+
+@funcao_tecnica_bp.route('/<uuid:funcao_id>/pessoas', methods=['GET'])
+def pessoas_por_funcao(funcao_id: uuid.UUID):
+    """Lista pessoas filtradas por função técnica com paginação.
+
+    Args:
+        funcao_id: UUID da função técnica para filtrar pessoas
+
+    Query Parameters:
+        page (int): Número da página (padrão: 1)
+        per_page (int): Itens por página (padrão: 20)
+
+    Returns:
+        Template renderizado com a lista paginada de pessoas da função técnica
+    """
+    page = request.args.get('page', default=1, type=int)
+    per_page = request.args.get('per_page', default=20, type=int)
+
+    # Limita per_page a um máximo razoável
+    per_page = min(per_page, 100)
+
+    try:
+        # Obtém a função técnica para exibir o nome
+        funcao = FuncaoTecnica.get_by_id(funcao_id, raise_if_not_found=True)
+
+        # Usa o FuncaoTecnicaService para obter as pessoas paginadas
+        pagination = FuncaoTecnicaService.listar_pessoas_por_funcao(
+            funcao_id=funcao_id,
+            page=page,
+            per_page=per_page
+        )
+
+        # Verifica se não há pessoas
+        if pagination.total == 0:
+            flash("Nenhuma pessoa encontrada para esta função.", category='info')
+
+        return render_template('funcao_tecnica/web/pessoas.jinja2',
+                             title=f"Pessoas - {funcao.nome}",
+                             funcao=funcao,
+                             pagination=pagination,
+                             page=page,
+                             per_page=per_page)
+
+    except FuncaoTecnica.RecordNotFoundError:
+        flash("Função técnica não encontrada.", category='warning')
+        return redirect(url_for('funcao_tecnica.listar_funcoes_tecnicas'))
+    except FuncaoTecnicaServiceError as e:
+        current_app.logger.error(f"Erro ao listar pessoas por função técnica: {e}")
+        flash("Ocorreu um erro ao buscar as pessoas. Tente novamente.", category='danger')
+        return redirect(url_for('funcao_tecnica.listar_funcoes_tecnicas'))
 
 
 @funcao_tecnica_bp.route('/<uuid:funcao_tecnica_id>/delete', methods=['POST'])

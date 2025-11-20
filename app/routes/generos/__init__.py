@@ -8,6 +8,7 @@ from app.forms.generos import GeneroEditForm
 from app.infra.modulos import db
 from app.models.filme import Genero
 from app.services.crud_service import CrudService
+from app.services.genero_service import GeneroService, GeneroServiceError
 
 genero_bp = Blueprint(name='genero',
                       import_name=__name__,
@@ -145,6 +146,57 @@ def editar_genero(genero_id: uuid.UUID):
                            title="Editar gênero",
                            form=form,
                            numero_de_filmes=numero_de_filmes)
+
+
+@genero_bp.route('/<uuid:genero_id>/filmes', methods=['GET'])
+def filmes_por_genero(genero_id: uuid.UUID):
+    """Lista filmes filtrados por gênero com paginação.
+
+    Args:
+        genero_id: UUID do gênero para filtrar filmes
+
+    Query Parameters:
+        page (int): Número da página (padrão: 1)
+        per_page (int): Itens por página (padrão: 20)
+
+    Returns:
+        Template renderizado com a lista paginada de filmes do gênero
+    """
+    page = request.args.get('page', default=1, type=int)
+    per_page = request.args.get('per_page', default=20, type=int)
+
+    # Limita per_page a um máximo razoável
+    per_page = min(per_page, 100)
+
+    try:
+        # Obtém o gênero para exibir o nome
+        genero = Genero.get_by_id(genero_id, raise_if_not_found=True)
+
+        # Usa o GeneroService para obter os filmes paginados
+        pagination = GeneroService.listar_filmes_por_genero(
+            genero_id=genero_id,
+            page=page,
+            per_page=per_page
+        )
+
+        # Verifica se não há filmes
+        if pagination.total == 0:
+            flash("Nenhum filme encontrado neste gênero.", category='info')
+
+        return render_template('genero/web/filmes.jinja2',
+                             title=f"Filmes - {genero.nome}",
+                             genero=genero,
+                             pagination=pagination,
+                             page=page,
+                             per_page=per_page)
+
+    except Genero.RecordNotFoundError:
+        flash("Gênero não encontrado.", category='warning')
+        return redirect(url_for('genero.listar_generos'))
+    except GeneroServiceError as e:
+        current_app.logger.error(f"Erro ao listar filmes por gênero: {e}")
+        flash("Ocorreu um erro ao buscar os filmes. Tente novamente.", category='danger')
+        return redirect(url_for('genero.listar_generos'))
 
 
 @genero_bp.route('/<uuid:genero_id>/delete', methods=['POST'])

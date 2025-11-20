@@ -8,6 +8,7 @@
     <!-- Bootstrap CSS (CDN) -->
     {{ bootstrap.load_css() }}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/site.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modal.css') }}">
     {% block styles %}
     {% endblock %}
     {% if title %}
@@ -56,6 +57,7 @@
 
 <!-- Bootstrap JS (CDN) -->
 {{ bootstrap.load_js() }}
+<script src="{{ url_for('static', filename='js/modal_funcao_tecnica.js') }}"></script>
 {% block scripts %}
 {% endblock %}
 </body>

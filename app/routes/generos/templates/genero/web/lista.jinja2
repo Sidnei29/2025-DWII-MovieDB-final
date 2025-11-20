@@ -45,6 +45,7 @@
                     <tr class="align-bottom">
                         <th scope="col">Nome</th>
                         <th scope="col">Descrição</th>
+                        <th scope="col" class="text-center">Filmes</th>
                         <th scope="col" class="text-center">Ativo</th>
                         <th scope="col" class="text-center">Operações</th>
                     </tr>
@@ -61,6 +62,17 @@
                                 {%- else -%}
                                     N/A
                                 {%- endif -%}
+                            </td>
+                            <td class="text-center align-middle">
+                                {% set filme_count = g.filmes|length %}
+                                {% if filme_count > 0 %}
+                                    <a href="{{ url_for('genero.filmes_por_genero', genero_id=g.id) }}" 
+                                       class="btn btn-sm btn-outline-primary">
+                                        {{ render_icon('film', size='1em') }} {{ filme_count }}
+                                    </a>
+                                {% else %}
+                                    <span class="text-muted">0</span>
+                                {% endif %}
                             </td>
                             <td class="text-center align-middle">
                                 {%- if g.ativo -%}
