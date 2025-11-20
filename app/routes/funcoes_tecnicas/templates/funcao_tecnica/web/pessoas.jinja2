@@ -16,38 +16,36 @@
                 </div>
             </div>
 
-            <!-- Filtragem e busca -->
-            <div class="mb-4">
-                <div class="clearfix">
-                    <form action="{{ url_for('funcao_tecnica.pessoas_por_funcao', funcao_id=funcao.id) }}" method="GET">
-                        <div class="row g-3 align-items-end">
-                            <!-- Busca por nome -->
-                            <div class="col-md-6">
-                                <label for="search" class="form-label">Buscar por nome:</label>
-                                <input name="search" type="text" class="form-control" id="search"
-                                       placeholder="Digite o nome da pessoa..."
-                                       value="{{ search if search else '' }}">
-                            </div>
-
-                            <!-- Registros por página -->
-                            <div class="col-md-3">
-                                <label for="per_page" class="form-label">Registros por página:</label>
-                                <select name="per_page" class="form-select" id="per_page">
-                                    {% for qtd in [12, 24, 48, 96] %}
-                                        <option value="{{ qtd }}"{% if qtd == per_page %} selected{% endif %}>{{ qtd }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-
-                            <!-- Botão de busca -->
-                            <div class="col-md-3">
-                                <button type="submit" class="btn btn-secondary w-100">
-                                    {{ render_icon('search', size='1em') }} Buscar
-                                </button>
-                            </div>
+            <!-- FORMULÁRIO DE BUSCA E FILTROS -->
+            <div class="mb-4" style="background-color: #f8f9fa; padding: 20px; border-radius: 5px;">
+                <form action="{{ url_for('funcao_tecnica.pessoas_por_funcao', funcao_id=funcao.id) }}" method="GET">
+                    <div class="row g-3 align-items-end">
+                        <!-- Busca por nome -->
+                        <div class="col-md-6">
+                            <label for="search" class="form-label">Buscar por nome:</label>
+                            <input name="search" type="text" class="form-control" id="search"
+                                   placeholder="Digite o nome da pessoa..."
+                                   value="{{ search if search else '' }}">
                         </div>
-                    </form>
-                </div>
+
+                        <!-- Registros por página -->
+                        <div class="col-md-3">
+                            <label for="per_page" class="form-label">Registros por página:</label>
+                            <select name="per_page" class="form-select" id="per_page">
+                                {% for qtd in [12, 24, 48, 96] %}
+                                    <option value="{{ qtd }}"{% if qtd == per_page %} selected{% endif %}>{{ qtd }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Botão de busca -->
+                        <div class="col-md-3">
+                            <button type="submit" class="btn btn-secondary w-100">
+                                {{ render_icon('search', size='1em') }} Buscar
+                            </button>
+                        </div>
+                    </div>
+                </form>
             </div>
 
             <!-- Grid de pessoas -->
