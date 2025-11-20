@@ -109,13 +109,15 @@ class GeneroService:
                                  genero_id: uuid.UUID,
                                  page: int = 1,
                                  per_page: int = 20,
+                                 search: str = None,
                                  session=None):
-        """Lista filmes de um gênero específico com paginação.
+        """Lista filmes de um gênero específico com paginação e busca.
 
         Args:
             genero_id: UUID do gênero
             page: Número da página (começa em 1). Default: 1
             per_page: Itens por página. Default: 20
+            search: Termo de busca para filtrar por título (opcional)
             session: Sessão SQLAlchemy opcional. Se None, usa a sessão padrão da classe.
 
         Returns:
@@ -136,8 +138,8 @@ class GeneroService:
             >>> resultado = GeneroService.listar_filmes_por_genero(genero_id)
             >>> filmes = resultado.items
 
-            >>> # Página específica
-            >>> resultado = GeneroService.listar_filmes_por_genero(genero_id, page=2, per_page=30)
+            >>> # Página específica com busca
+            >>> resultado = GeneroService.listar_filmes_por_genero(genero_id, page=2, per_page=30, search="matrix")
         """
         if session is None:
             session = cls._default_session
@@ -154,8 +156,18 @@ class GeneroService:
                 select(Filme)
                 .join(FilmeGenero, Filme.id == FilmeGenero.filme_id)
                 .where(FilmeGenero.genero_id == genero_id)
-                .order_by(Filme.titulo_portugues, Filme.titulo_original)
             )
+
+            # Adiciona filtro de busca se fornecido
+            if search:
+                from sqlalchemy import or_
+                search_filter = or_(
+                    Filme.titulo_portugues.ilike(f'%{search}%'),
+                    Filme.titulo_original.ilike(f'%{search}%')
+                )
+                stmt = stmt.where(search_filter)
+
+            stmt = stmt.order_by(Filme.titulo_portugues, Filme.titulo_original)
 
             # Aplica paginação
             return db.paginate(

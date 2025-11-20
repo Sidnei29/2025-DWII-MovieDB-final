@@ -150,20 +150,22 @@ def editar_genero(genero_id: uuid.UUID):
 
 @genero_bp.route('/<uuid:genero_id>/filmes', methods=['GET'])
 def filmes_por_genero(genero_id: uuid.UUID):
-    """Lista filmes filtrados por gênero com paginação.
+    """Lista filmes filtrados por gênero com paginação e busca.
 
     Args:
         genero_id: UUID do gênero para filtrar filmes
 
     Query Parameters:
         page (int): Número da página (padrão: 1)
-        per_page (int): Itens por página (padrão: 20)
+        per_page (int): Itens por página (padrão: 24)
+        search (str): Termo de busca para filtrar por título
 
     Returns:
         Template renderizado com a lista paginada de filmes do gênero
     """
     page = request.args.get('page', default=1, type=int)
-    per_page = request.args.get('per_page', default=20, type=int)
+    per_page = request.args.get('per_page', default=24, type=int)
+    search = request.args.get('search', default=None, type=str)
 
     # Limita per_page a um máximo razoável
     per_page = min(per_page, 100)
@@ -176,19 +178,24 @@ def filmes_por_genero(genero_id: uuid.UUID):
         pagination = GeneroService.listar_filmes_por_genero(
             genero_id=genero_id,
             page=page,
-            per_page=per_page
+            per_page=per_page,
+            search=search
         )
 
         # Verifica se não há filmes
         if pagination.total == 0:
-            flash("Nenhum filme encontrado neste gênero.", category='info')
+            if search:
+                flash(f"Nenhum filme encontrado neste gênero com o termo '{search}'.", category='info')
+            else:
+                flash("Nenhum filme encontrado neste gênero.", category='info')
 
         return render_template('genero/web/filmes.jinja2',
                              title=f"Filmes - {genero.nome}",
                              genero=genero,
                              pagination=pagination,
                              page=page,
-                             per_page=per_page)
+                             per_page=per_page,
+                             search=search)
 
     except Genero.RecordNotFoundError:
         flash("Gênero não encontrado.", category='warning')

@@ -265,6 +265,10 @@
 
 
 
+
+
+
+
   - Update `GeneroService.listar_filmes_por_genero()` to accept search parameter
   - Add search filter using `or_()` to match titulo_portugues or titulo_original with `ilike`
   - Update `genero_bp.filmes_por_genero()` route to handle search query parameter

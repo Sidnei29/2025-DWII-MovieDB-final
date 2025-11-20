@@ -16,6 +16,40 @@
                 </div>
             </div>
 
+            <!-- Filtragem e busca -->
+            <div class="mb-4">
+                <div class="clearfix">
+                    <form action="{{ url_for('genero.filmes_por_genero', genero_id=genero.id) }}" method="GET">
+                        <div class="row g-3 align-items-end">
+                            <!-- Busca por título -->
+                            <div class="col-md-6">
+                                <label for="search" class="form-label">Buscar por título:</label>
+                                <input name="search" type="text" class="form-control" id="search"
+                                       placeholder="Digite o título do filme..."
+                                       value="{{ search if search else '' }}">
+                            </div>
+
+                            <!-- Registros por página -->
+                            <div class="col-md-3">
+                                <label for="per_page" class="form-label">Registros por página:</label>
+                                <select name="per_page" class="form-select" id="per_page">
+                                    {% for qtd in [12, 24, 48, 96] %}
+                                        <option value="{{ qtd }}"{% if qtd == per_page %} selected{% endif %}>{{ qtd }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <!-- Botão de busca -->
+                            <div class="col-md-3">
+                                <button type="submit" class="btn btn-secondary w-100">
+                                    {{ render_icon('search', size='1em') }} Buscar
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
             <!-- Mosaico de filmes -->
             {% if pagination.items %}
                 <div class="row g-4 justify-content-start mb-4">
@@ -101,8 +135,15 @@
                 <div class="text-center py-5">
                     <div class="text-muted">
                         {{ render_icon('film', size='3em', color='secondary') }}
-                        <h5 class="mt-3">Nenhum filme encontrado neste gênero</h5>
-                        <p>Não há filmes cadastrados para o gênero "{{ genero.nome }}".</p>
+                        <h5 class="mt-3">Nenhum filme encontrado</h5>
+                        {% if search %}
+                            <p>Não foram encontrados filmes no gênero "{{ genero.nome }}" com o termo "{{ search }}".</p>
+                            <a href="{{ url_for('genero.filmes_por_genero', genero_id=genero.id, per_page=per_page) }}" class="btn btn-secondary me-2">
+                                {{ render_icon('x-circle', size='1em') }} Limpar Busca
+                            </a>
+                        {% else %}
+                            <p>Não há filmes cadastrados para o gênero "{{ genero.nome }}".</p>
+                        {% endif %}
                         <a href="{{ url_for('filme.listar_filmes') }}" class="btn btn-secondary">
                             {{ render_icon('arrow-left', size='1em') }} Voltar ao Catálogo
                         </a>
@@ -117,10 +158,14 @@
                         Mostrando {{ pagination.first }} a {{ pagination.last }} de {{ pagination.total }} filmes
                     </div>
                     <div>
+                        {% set pagination_args = {'genero_id': genero.id, 'per_page': per_page} %}
+                        {% if search %}
+                            {% set _ = pagination_args.update({'search': search}) %}
+                        {% endif %}
                         {{ render_pagination(pagination, 'genero.filmes_por_genero',
                                             size='sm',
                                             align='right',
-                                            args={'genero_id': genero.id, 'per_page': per_page}) }}
+                                            args=pagination_args) }}
                     </div>
                 </div>
             {% endif %}
