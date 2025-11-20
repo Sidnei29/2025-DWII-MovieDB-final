@@ -17,9 +17,10 @@ funcao_tecnica_bp = Blueprint(name='funcao_tecnica',
                               template_folder="templates", )
 
 
-@funcao_tecnica_bp.route('/', methods=['GET'])
-def listar_funcoes_tecnicas():
-    """Lista todas as funções técnicas com suporte a filtros e paginação.
+@funcao_tecnica_bp.route('/admin', methods=['GET'])
+@login_required
+def listar_funcoes_tecnicas_admin():
+    """Lista todas as funções técnicas com suporte a filtros e paginação (admin).
 
     Query Parameters:
         page (int): Número da página (padrão: 1)
