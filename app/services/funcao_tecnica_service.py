@@ -111,13 +111,15 @@ class FuncaoTecnicaService:
                                   funcao_id: uuid.UUID,
                                   page: int = 1,
                                   per_page: int = 20,
+                                  search: str = None,
                                   session=None):
-        """Lista pessoas que executam uma função técnica específica com paginação.
+        """Lista pessoas que executam uma função técnica específica com paginação e busca.
 
         Args:
             funcao_id: UUID da função técnica
             page: Número da página (começa em 1). Default: 1
             per_page: Itens por página. Default: 20
+            search: Termo de busca para filtrar por nome (opcional)
             session: Sessão SQLAlchemy opcional. Se None, usa a sessão padrão da classe.
 
         Returns:
@@ -139,8 +141,8 @@ class FuncaoTecnicaService:
             >>> for pessoa, film_count in resultado.items:
             ...     print(f"{pessoa.nome}: {film_count} filmes")
 
-            >>> # Página específica
-            >>> resultado = FuncaoTecnicaService.listar_pessoas_por_funcao(funcao_id, page=2, per_page=30)
+            >>> # Página específica com busca
+            >>> resultado = FuncaoTecnicaService.listar_pessoas_por_funcao(funcao_id, page=2, per_page=30, search="spielberg")
         """
         if session is None:
             session = cls._default_session
@@ -158,9 +160,13 @@ class FuncaoTecnicaService:
                 select(Pessoa)
                 .join(EquipeTecnica, Pessoa.id == EquipeTecnica.pessoa_id)
                 .where(EquipeTecnica.funcao_tecnica_id == funcao_id)
-                .group_by(Pessoa.id)
-                .order_by(Pessoa.nome)
             )
+
+            # Adiciona filtro de busca se fornecido
+            if search:
+                stmt = stmt.where(Pessoa.nome.ilike(f'%{search}%'))
+
+            stmt = stmt.group_by(Pessoa.id).order_by(Pessoa.nome)
 
             # Aplica paginação
             pagination = db.paginate(

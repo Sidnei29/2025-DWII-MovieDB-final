@@ -152,20 +152,22 @@ def editar_funcao_tecnica(funcao_tecnica_id: uuid.UUID):
 
 @funcao_tecnica_bp.route('/<uuid:funcao_id>/pessoas', methods=['GET'])
 def pessoas_por_funcao(funcao_id: uuid.UUID):
-    """Lista pessoas filtradas por função técnica com paginação.
+    """Lista pessoas filtradas por função técnica com paginação e busca.
 
     Args:
         funcao_id: UUID da função técnica para filtrar pessoas
 
     Query Parameters:
         page (int): Número da página (padrão: 1)
-        per_page (int): Itens por página (padrão: 20)
+        per_page (int): Itens por página (padrão: 24)
+        search (str): Termo de busca para filtrar por nome
 
     Returns:
         Template renderizado com a lista paginada de pessoas da função técnica
     """
     page = request.args.get('page', default=1, type=int)
-    per_page = request.args.get('per_page', default=20, type=int)
+    per_page = request.args.get('per_page', default=24, type=int)
+    search = request.args.get('search', default=None, type=str)
 
     # Limita per_page a um máximo razoável
     per_page = min(per_page, 100)
@@ -178,19 +180,24 @@ def pessoas_por_funcao(funcao_id: uuid.UUID):
         pagination = FuncaoTecnicaService.listar_pessoas_por_funcao(
             funcao_id=funcao_id,
             page=page,
-            per_page=per_page
+            per_page=per_page,
+            search=search
         )
 
         # Verifica se não há pessoas
         if pagination.total == 0:
-            flash("Nenhuma pessoa encontrada para esta função.", category='info')
+            if search:
+                flash(f"Nenhuma pessoa encontrada para esta função com o termo '{search}'.", category='info')
+            else:
+                flash("Nenhuma pessoa encontrada para esta função.", category='info')
 
         return render_template('funcao_tecnica/web/pessoas.jinja2',
                              title=f"Pessoas - {funcao.nome}",
                              funcao=funcao,
                              pagination=pagination,
                              page=page,
-                             per_page=per_page)
+                             per_page=per_page,
+                             search=search)
 
     except FuncaoTecnica.RecordNotFoundError:
         flash("Função técnica não encontrada.", category='warning')
